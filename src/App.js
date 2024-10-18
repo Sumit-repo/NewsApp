@@ -1,25 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import React, { Component } from "react";
+import Navbar from "./components/Navbar";
+import News from "./components/News";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class App extends Component {
+  switchTheme = () => {
+    const element = document.body;
+    const isDark = element.dataset.bsTheme === "dark";
+    element.dataset.bsTheme = isDark ? "light" : "dark";
+  };
+
+  render() {
+    return (
+      <div>
+        <Navbar title="NewsAPP" switchTheme={this.switchTheme} />
+        <News pageSize={4}/>
+      </div>
+    );
+  }
 }
-
-export default App;
