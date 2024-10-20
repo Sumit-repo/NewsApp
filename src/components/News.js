@@ -21,12 +21,12 @@ export class News extends Component {
   fetchNews = async () => {
     this.setState({ loading: true });
     const apiKey = process.env.REACT_APP_API_KEY;
-    let url = `https://newsapi.org/v2/everything?q=india&apiKey=${apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+    let url = `https://newsapi.org/v2/top-headlines?category=sports&country=us&apiKey=${apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
     let response = await fetch(url);
 
     if (response.status === 429) {
-      this.setState({ limitReached: true, loading: false }); // Update state to show the limit-reached message
-      return; // Stop further execution
+      this.setState({ limitReached: true, loading: false });
+      return;
     } else if (!response.ok) {
       throw new Error(`HTTP Error! Status: ${response.status}`);
     }
@@ -75,57 +75,84 @@ export class News extends Component {
 
   render() {
     if (this.state.limitReached) {
-      return <HandleLimitReached />; // Render the limit-reached component
+      return <HandleLimitReached />;
     }
 
     return (
-      <div className="container my-3">
-        <h1 className="text-center my-5">NewsAPP - Your daily news app!</h1>
+      <div className="container">
+        <div className="pb-4"/>
+        <h2 className="text-center mt-5 mb-3">NewsAPP - <i>Your daily news app!</i></h2>
         {this.state.loading && <Spinner />}
-        <div className="row">
-          {this.state.articles
-            .filter((element) => !element.url.includes("removed.com"))
-            .map((element) => {
-              return (
-                <div key={element.url} className="col-md-3">
-                  <NewsItem
-                    className="text-truncate"
-                    title={
-                      element.title == null
-                        ? "NewsAPP"
-                        : element.title.slice(0, 40)
-                    }
-                    desc={
-                      element.description == null
-                        ? "NewsAPP"
-                        : element.description.slice(0, 80)
-                    }
-                    imgUrl={
-                      element.urlToImage == null ? image : element.urlToImage
-                    }
-                    newsUrl={element.url}
-                  />
-                </div>
-              );
-            })}
-        </div>
-        <div className="d-flex justify-content-between pr-4">
-          <button
-            type="button"
-            disabled={this.state.page === 1}
-            onClick={this.prevClick}
-            className="btn btn-outline-success"
-          >
-            &larr; Previous
-          </button>
-          <button
-            type="button"
-            onClick={this.nextClick}
-            disabled={this.state.totalPage === this.state.page}
-            className="btn btn-outline-success"
-          >
-            Next &rarr;
-          </button>
+        <div className="card">
+          <div className="card-header">
+            <ul className="nav nav-tabs card-header-tabs  d-flex justify-content-center">
+              <li className="nav-item">
+                <a className="nav-link" aria-current="true" href="/">
+                  India
+                </a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link active" aria-current="true" href="/">
+                  World
+                </a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" href="/">
+                  Top-Headlines
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div className="card-body h-100">
+            <div className="row text-center mx-2">
+              {!this.state.loading &&
+                this.state.articles
+                  .filter((element) => !element.url.includes("removed.com"))
+                  .map((element) => {
+                    return (
+                      <div key={element.url} className="col-md-3">
+                        <NewsItem
+                          className="text-truncate"
+                          title={
+                            element.title == null
+                              ? "NewsAPP"
+                              : element.title.slice(0, 40)
+                          }
+                          desc={
+                            element.description == null
+                              ? "NewsAPP"
+                              : element.description.slice(0, 80)
+                          }
+                          imgUrl={
+                            element.urlToImage == null
+                              ? image
+                              : element.urlToImage
+                          }
+                          newsUrl={element.url}
+                        />
+                      </div>
+                    );
+                  })}
+            </div>
+            <div className="d-flex justify-content-between text-center mx-2">
+              <button
+                type="button"
+                disabled={this.state.page === 1}
+                onClick={this.prevClick}
+                className="btn btn-outline-success mx-3"
+              >
+                &larr; Previous
+              </button>
+              <button
+                type="button"
+                onClick={this.nextClick}
+                disabled={this.state.totalPage === this.state.page}
+                className="btn btn-outline-success mx-2"
+              >
+                Next &rarr;
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
