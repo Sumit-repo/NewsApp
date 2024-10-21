@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 
 export class Navbar extends Component {
   render() {
@@ -8,9 +9,9 @@ export class Navbar extends Component {
           className={`navbar fixed-top navbar-expand-lg ${this.props.background}`}
         >
           <div className="container-fluid">
-            <a className="navbar-brand mx-2" href="/">
+            <Link className="navbar-brand mx-2" to="/newsapp">
               {this.props.title}
-            </a>
+            </Link>
             <button
               className="navbar-toggler"
               type="button"
@@ -22,106 +23,98 @@ export class Navbar extends Component {
             >
               <span className="navbar-toggler-icon"></span>
             </button>
-            <div
-              className="collapse navbar-collapse"
-              id="navbarSupportedContent"
-            >
+            <div className="collapse navbar-collapse" id="navbarSupportedContent">
               <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                 <li className="nav-item mx-2">
-                  <a className="nav-link active" aria-current="page" href="/">
+                  <Link className="nav-link" aria-current="page" to="/newsapp/home">
                     Home
-                  </a>
+                  </Link>
                 </li>
                 <li className="nav-item dropdown mx-2">
-                  <a
+                  <Link
                     className="nav-link dropdown-toggle"
-                    href="/"
+                    to="/"
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
                     Country
-                  </a>
+                  </Link>
                   <ul className="dropdown-menu">
                     <li>
-                      <a className="dropdown-item" href="/">
+                      <Link className="dropdown-item" to="/newsapp/country/india">
                         India
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="/">
+                      <Link className="dropdown-item" to="/newsapp/country/australia">
                         Australia
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="/">
+                      <Link className="dropdown-item" to="/newsapp/country/us">
                         United States
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="/">
+                      <Link className="dropdown-item" to="/newsapp/country/uk">
                         United Kingdom
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="/">
+                      <Link className="dropdown-item" to="/newsapp/country/uae">
                         United Arab Emirates
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 </li>
                 <li className="nav-item dropdown mx-2">
-                  <a
+                  <Link
                     className="nav-link dropdown-toggle"
-                    href="/"
+                    to="/"
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
                     Category
-                  </a>
+                  </Link>
                   <ul className="dropdown-menu">
                     <li>
-                      <a className="dropdown-item" href="/">
+                      <Link className="dropdown-item" to="/newsapp/category/business">
                         Business
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="/">
+                      <Link className="dropdown-item" to="/newsapp/category/entertainment">
                         Entertainment
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="/">
-                        General
-                      </a>
-                    </li>
-                    <li>
-                      <a className="dropdown-item" href="/">
+                      <Link className="dropdown-item" to="/newsapp/category/health">
                         Health
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="/">
+                      <Link className="dropdown-item" to="/newsapp/category/science">
                         Science
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="/">
+                      <Link className="dropdown-item" to="/newsapp/category/sports">
                         Sports
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="/">
+                      <Link className="dropdown-item" to="/newsapp/category/technology">
                         Technology
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="/about">
+                  <Link className="nav-link" to="/newsapp/about">
                     About
-                  </a>
+                  </Link>
                 </li>
               </ul>
               <form className="d-flex" role="search">
@@ -135,7 +128,7 @@ export class Navbar extends Component {
                   Search
                 </button>
               </form>
-              <div class="vr ms-4"></div>
+              <div className="vr ms-4"></div>
               <div className="form-check form-switch mx-4">
                 <input
                   className="form-check-input"
@@ -143,10 +136,7 @@ export class Navbar extends Component {
                   onClick={this.props.switchTheme}
                   id="flexSwitchCheckDefault"
                 />
-                <label
-                  className="form-check-label"
-                  htmlFor="flexSwitchCheckDefault"
-                >
+                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
                   Dark Mode
                 </label>
               </div>

@@ -20,9 +20,10 @@ export class News extends Component {
 
   fetchNews = async () => {
     this.setState({ loading: true });
-    const apiKey = process.env.REACT_APP_API_KEY;
-    let url = `https://newsapi.org/v2/top-headlines?category=sports&country=us&apiKey=${apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
-    let response = await fetch(url);
+    let newsAppUrl =
+      this.props.url +
+      `&apiKey=${process.env.REACT_APP_API_KEY}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+    let response = await fetch(newsAppUrl);
 
     if (response.status === 429) {
       this.setState({ limitReached: true, loading: false });
@@ -51,6 +52,9 @@ export class News extends Component {
   }
 
   async componentDidMount() {
+    const url = this.props.url;
+    console.log(url);
+
     await this.fetchNews();
     await this.countTotalPage();
   }
@@ -80,14 +84,20 @@ export class News extends Component {
 
     return (
       <div className="container">
-        <div className="pb-4"/>
-        <h2 className="text-center mt-5 mb-3">NewsAPP - <i>Your daily news app!</i></h2>
+        <div className="pb-4" />
+        <h2 className="text-center mt-5 mb-3">
+          NewsAPP - <i>Your daily news app!</i>
+        </h2>
         {this.state.loading && <Spinner />}
         <div className="card">
           <div className="card-header">
             <ul className="nav nav-tabs card-header-tabs  d-flex justify-content-center">
               <li className="nav-item">
-                <a className="nav-link" aria-current="true" href="/">
+                <a
+                  className="nav-link"
+                  aria-current="true"
+                  href="https://newsapi.org/v2/everything?q=India&apiKey=8babfdc8702a451eb91e485f13bfd90f"
+                >
                   India
                 </a>
               </li>
