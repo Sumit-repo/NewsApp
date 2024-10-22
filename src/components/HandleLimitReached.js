@@ -1,19 +1,18 @@
-import React, { Component } from "react";
+import React from "react";
 
-export default class HandleLimitReached extends Component {
-  handleRetry = () => {
-    window.location.reload();
-  };
-
-  render() {
-    return (
-      <div className="text-center">
-        <h1>429</h1>
-        <h3>API limit exhausted! please try later</h3>
-        <button onClick={this.handleRetry} className="btn btn-primary mt-3">
+export default function HandleLimitReached({ onRetry, onContinue }) {
+  return (
+    <div className="text-center">
+      <h1>429</h1>
+      <h3>API limit exhausted! Please try later.</h3>
+      <div className="container d-flex justify-content-center">
+        <button onClick={onRetry} className="btn btn-primary mt-3 mx-2">
           Retry
         </button>
+        <button onClick={onContinue} className="btn btn-secondary mt-3 mx-2">
+          Continue with Previous Results
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
 }

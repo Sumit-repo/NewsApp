@@ -1,172 +1,136 @@
-import React, { Component } from "react";
 import NewsItem from "./NewsItem";
 import image from "../570914.png";
 import data from "../DummyData.json";
-import Spinner from "./Spinner";
+import { useState, useEffect } from "react";
 import HandleLimitReached from "./HandleLimitReached";
+import InfiniteScroll from "react-infinite-scroll-component";
 
-export class News extends Component {
-  constructor() {
-    super();
-    this.state = {
-      articles: data.articles,
-      loading: false,
-      page: 1,
-      totalArticle: data.totalResults,
-      totalPage: 0,
-      limitReached: false,
-    };
-  }
+export default function News(props) {
+  const [articles, setArticles] = useState(data.articles);
+  const [page, setPage] = useState(1);
+  const [totalArticle, setTotalArticle] = useState(0);
+  const [limitReached, setLimitReached] = useState(false);
+  const [showOldData, setShowOldData] = useState(false);
 
-  fetchNews = async () => {
-    this.setState({ loading: true });
-    let newsAppUrl =
-      this.props.url +
-      `&apiKey=${process.env.REACT_APP_API_KEY}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
-    let response = await fetch(newsAppUrl);
+  const fetchNews = async () => {
+    if (showOldData) return;
+    try {
+      props.setProgress(0);
+      let newsAppUrl = `${props.url}&apiKey=${process.env.REACT_APP_API_KEY}&page=${page}&pageSize=${props.pageSize}`;
+      let response = await fetch(newsAppUrl);
+      props.setProgress(40);
 
-    if (response.status === 429) {
-      this.setState({ limitReached: true, loading: false });
-      return;
-    } else if (!response.ok) {
-      throw new Error(`HTTP Error! Status: ${response.status}`);
+      if (response.status === 429) {
+        return setLimitReached(true);
+      } else if (!response.ok) {
+        throw new Error(`HTTP Error! Status: ${response.status}`);
+      }
+
+      let parsedData = await response.json();
+      setArticles(parsedData.articles);
+      setTotalArticle(parsedData.totalResults);
+      props.setProgress(100);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+      props.setProgress(100);
     }
-
-    let parsedData = await response.json();
-    this.setState(
-      {
-        articles: parsedData.articles,
-        totalArticle: parsedData.totalResults,
-        loading: false,
-      },
-      () => {
-        this.countTotalPage();
-      }
-    );
   };
 
-  async countTotalPage() {
-    this.setState({
-      totalPage: Math.ceil(this.state.totalArticle / this.props.pageSize),
-    });
-  }
+  const fetchData = async () => {
+    if (showOldData) return;
+    try {
+      props.setProgress(80);
+      let newsAppUrl = `${props.url}&apiKey=${
+        process.env.REACT_APP_API_KEY
+      }&page=${page + 1}&pageSize=${props.pageSize}`;
+      let response = await fetch(newsAppUrl);
 
-  async componentDidMount() {
-    const url = this.props.url;
-    console.log(url);
-
-    await this.fetchNews();
-    await this.countTotalPage();
-  }
-
-  prevClick = async () => {
-    this.setState(
-      (prevState) => ({ page: prevState.page - 1 }),
-      async () => {
-        await this.fetchNews();
+      if (response.status === 429) {
+        return setLimitReached(true);
+      } else if (!response.ok) {
+        throw new Error(`HTTP Error! Status: ${response.status}`);
       }
-    );
-  };
 
-  nextClick = async () => {
-    this.setState(
-      (prevState) => ({ page: prevState.page + 1 }),
-      async () => {
-        await this.fetchNews();
-      }
-    );
-  };
-
-  render() {
-    if (this.state.limitReached) {
-      return <HandleLimitReached />;
+      let parsedData = await response.json();
+      setArticles([...articles, ...parsedData.articles]); // Fixing the issue
+      setTotalArticle(parsedData.totalResults);
+      setPage(page + 1);
+      props.setProgress(100);
+    } catch (error) {
+      console.error("Error fetching more news:", error);
+      props.setProgress(100);
     }
+  };
 
+  useEffect(() => {
+    if (!showOldData) {
+      fetchNews();
+    }
+  }, [props.url]);
+
+  const handleRetry = () => {
+    setLimitReached(false);
+    setShowOldData(false);
+    fetchNews();
+  };
+
+  const handleContinue = async () => {
+    setShowOldData(true);
+    setArticles(data.articles);
+  };
+
+  if (limitReached) {
     return (
-      <div className="container">
-        <div className="pb-4" />
-        <h2 className="text-center mt-5 mb-3">
-          NewsAPP - <i>Your daily news app!</i>
-        </h2>
-        {this.state.loading && <Spinner />}
-        <div className="card">
-          <div className="card-header">
-            <ul className="nav nav-tabs card-header-tabs  d-flex justify-content-center">
-              <li className="nav-item">
-                <a
-                  className="nav-link"
-                  aria-current="true"
-                  href="https://newsapi.org/v2/everything?q=India&apiKey=8babfdc8702a451eb91e485f13bfd90f"
-                >
-                  India
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link active" aria-current="true" href="/">
-                  World
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="/">
-                  Top-Headlines
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div className="card-body h-100">
-            <div className="row text-center mx-2">
-              {!this.state.loading &&
-                this.state.articles
-                  .filter((element) => !element.url.includes("removed.com"))
-                  .map((element) => {
-                    return (
-                      <div key={element.url} className="col-md-3">
-                        <NewsItem
-                          className="text-truncate"
-                          title={
-                            element.title == null
-                              ? "NewsAPP"
-                              : element.title.slice(0, 40)
-                          }
-                          desc={
-                            element.description == null
-                              ? "NewsAPP"
-                              : element.description.slice(0, 80)
-                          }
-                          imgUrl={
-                            element.urlToImage == null
-                              ? image
-                              : element.urlToImage
-                          }
-                          newsUrl={element.url}
-                        />
-                      </div>
-                    );
-                  })}
-            </div>
-            <div className="d-flex justify-content-between text-center mx-2">
-              <button
-                type="button"
-                disabled={this.state.page === 1}
-                onClick={this.prevClick}
-                className="btn btn-outline-success mx-3"
-              >
-                &larr; Previous
-              </button>
-              <button
-                type="button"
-                onClick={this.nextClick}
-                disabled={this.state.totalPage === this.state.page}
-                className="btn btn-outline-success mx-2"
-              >
-                Next &rarr;
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <HandleLimitReached onRetry={handleRetry} onContinue={handleContinue} />
     );
   }
-}
 
-export default News;
+  return (
+    <div className="container">
+      <div className="pb-4" />
+      <h2 className="text-center mt-5 mb-3">
+        NewsAPP - <i>Your daily news app!</i>
+      </h2>
+      <InfiniteScroll
+        dataLength={articles.length}
+        next={fetchData}
+        hasMore={articles.length !== totalArticle && !showOldData}
+        endMessage={
+          <p style={{ textAlign: "center" }}>
+            <b>Yay! You have seen it all</b>
+          </p>
+        }
+      >
+        <div className="row mx-2">
+          {articles
+            .filter((element) => !element.url.includes("removed.com"))
+            .map((element, index) => {
+              return (
+                <div key={index} className="col-md-3">
+                  <NewsItem
+                    className="text-truncate"
+                    title={
+                      element.title == null
+                        ? "NewsAPP"
+                        : element.title.slice(0, 45)
+                    }
+                    desc={
+                      element.description == null
+                        ? "NewsAPP"
+                        : element.description.slice(0, 80)
+                    }
+                    imgUrl={
+                      element.urlToImage == null ? image : element.urlToImage
+                    }
+                    newsUrl={element.url}
+                    time={element.publishedAt}
+                    source={element.source.name}
+                  />
+                </div>
+              );
+            })}
+        </div>
+      </InfiniteScroll>
+    </div>
+  );
+}
