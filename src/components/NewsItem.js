@@ -42,7 +42,7 @@ export default function NewsItem(props) {
             className="card-img-top"
             alt="News"
           />
-          <div className="card-img-overlay mx-3">
+          <div className="card-img-overlay mx-3" style={{height: "10vh"}}>
             <span className="badge text-bg-primary position-absolute start-0">
               {source}
             </span>
@@ -52,7 +52,6 @@ export default function NewsItem(props) {
             <p className="card-text" style={{height: "10vh"}}>{desc ? desc : "No Description"}...</p>
             <div className="d-flex justify-content-between">
               <a
-                ref={"noreff"}
                 className="btn btn-primary btn-sm"
                 href={newsUrl} 
               >

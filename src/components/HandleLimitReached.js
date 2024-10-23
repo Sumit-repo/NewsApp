@@ -1,6 +1,8 @@
-import React from "react";
+import { React } from "react";
 
-export default function HandleLimitReached({ onRetry, onContinue }) {
+function HandleLimitReached(props) {
+  let { onRetry, onContinue} = props;
+
   return (
     <div className="text-center">
       <h1>429</h1>
@@ -16,3 +18,5 @@ export default function HandleLimitReached({ onRetry, onContinue }) {
     </div>
   );
 }
+
+export default HandleLimitReached;

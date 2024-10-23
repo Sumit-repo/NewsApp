@@ -8,7 +8,7 @@ export default function News(props) {
   const [articles, setArticles] = useState(data.articles);
   const [page, setPage] = useState(1);
   const [totalArticle, setTotalArticle] = useState(0);
-  const [limitReached, setLimitReached] = useState(false);
+  const [apiLimitReached, setApiLimitReached] = useState(false);
   const [showOldData, setShowOldData] = useState(false);
 
   const fetchNews = async () => {
@@ -21,7 +21,7 @@ export default function News(props) {
 
       if (response.status === 429) {
         props.setProgress(80);
-        return setLimitReached(true);
+        return setApiLimitReached(true);
       } else if (!response.ok) {
         throw new Error(`HTTP Error! Status: ${response.status}`);
       }
@@ -47,7 +47,7 @@ export default function News(props) {
 
       if (response.status === 429) {
         props.setProgress(80);
-        return setLimitReached(true);
+        return setApiLimitReached(true);
       } else if (!response.ok) {
         throw new Error(`HTTP Error! Status: ${response.status}`);
       }
@@ -65,72 +65,77 @@ export default function News(props) {
 
   useEffect(() => {
     setPage(1);
-    if (!showOldData) {
-      fetchNews();
-    }
+    fetchNews();
   }, [props.url]);
 
   const handleRetry = () => {
-    setLimitReached(false);
-    setShowOldData(false);
+    window.location.reload();
   };
 
   const handleContinue = async () => {
+    props.setProgress(0);
+    setApiLimitReached(false);
     setShowOldData(true);
-    setArticles(data.articles);
+    setArticles(data.articles || []);
+    props.setProgress(100);
   };
 
-  if (limitReached) {
-    props.setProgress(100);
+  if (apiLimitReached) {
     return (
-      <HandleLimitReached onRetry={handleRetry} onContinue={handleContinue} />
+      <HandleLimitReached
+        onRetry={handleRetry}
+        onContinue={handleContinue}
+        setProgress={props.setProgress}
+      />
     );
   }
 
   return (
-    <div className="container">
-      <div className="pb-4" />
-      <h2 className="text-center mt-5 mb-3">
-        NewsAPP - <i>Your daily news app!</i>
-      </h2>
-      <InfiniteScroll
-        dataLength={articles.length}
-        next={fetchData}
-        hasMore={articles.length !== totalArticle && !showOldData}
-        endMessage={
-          <p style={{ textAlign: "center" }}>
-            <b>Yay! You have seen it all</b>
-          </p>
-        }
-      >
-        <div className="row mx-2">
-          {articles
-            .filter((element) => !element.url.includes("removed.com"))
-            .map((element, index) => {
-              return (
-                <div key={index} className="col-md-3">
-                  <NewsItem
-                    className="text-truncate"
-                    title={
-                      element.title == null
-                        ? "NewsAPP"
-                        : element.title.slice(0, 45)
-                    }
-                    desc={
-                      element.description == null
-                        ? "NewsAPP"
-                        : element.description.slice(0, 80)
-                    }
-                    imgUrl={element.urlToImage}
-                    newsUrl={element.url}
-                    time={element.publishedAt}
-                    source={element.source.name}
-                  />
-                </div>
-              );
-            })}
-        </div>
-      </InfiniteScroll>
+    <div className="App">
+      <div className="container">
+        <div className="pb-4" />
+        <h2 className="text-center mt-5 mb-3">
+          NewsAPP - <i>Your daily news app!</i>
+        </h2>
+        <InfiniteScroll
+          dataLength={articles.length}
+          next={fetchData}
+          hasMore={articles.length !== totalArticle && !showOldData}
+          endMessage={
+            <p style={{ textAlign: "center" }}>
+              <b>Yay! You have seen it all</b>
+            </p>
+          }
+        >
+          <div className="row mx-2">
+            {articles
+              .filter((element) => !element.url.includes("removed.com"))
+              .map((element, index) => {
+                return (
+                  <div key={index} className="col-md-3">
+                    <NewsItem
+                      className="text-truncate"
+                      title={
+                        element.title == null
+                          ? "NewsAPP"
+                          : element.title.slice(0, 45)
+                      }
+                      desc={
+                        element.description == null
+                          ? "NewsAPP"
+                          : element.description.slice(0, 80)
+                      }
+                      imgUrl={element.urlToImage}
+                      newsUrl={element.url}
+                      time={element.publishedAt}
+                      source={element.source.name}
+                    />
+                  </div>
+                );
+              })}
+          </div>
+        </InfiniteScroll>
+      </div>
     </div>
   );
 }
