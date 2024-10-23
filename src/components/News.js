@@ -1,5 +1,4 @@
 import NewsItem from "./NewsItem";
-import image from "../570914.png";
 import data from "../DummyData.json";
 import { useState, useEffect } from "react";
 import HandleLimitReached from "./HandleLimitReached";
@@ -21,6 +20,7 @@ export default function News(props) {
       props.setProgress(40);
 
       if (response.status === 429) {
+        props.setProgress(80);
         return setLimitReached(true);
       } else if (!response.ok) {
         throw new Error(`HTTP Error! Status: ${response.status}`);
@@ -46,13 +46,14 @@ export default function News(props) {
       let response = await fetch(newsAppUrl);
 
       if (response.status === 429) {
+        props.setProgress(80);
         return setLimitReached(true);
       } else if (!response.ok) {
         throw new Error(`HTTP Error! Status: ${response.status}`);
       }
 
       let parsedData = await response.json();
-      setArticles([...articles, ...parsedData.articles]); // Fixing the issue
+      setArticles([...articles, ...parsedData.articles]);
       setTotalArticle(parsedData.totalResults);
       setPage(page + 1);
       props.setProgress(100);
@@ -63,6 +64,7 @@ export default function News(props) {
   };
 
   useEffect(() => {
+    setPage(1);
     if (!showOldData) {
       fetchNews();
     }
@@ -71,7 +73,6 @@ export default function News(props) {
   const handleRetry = () => {
     setLimitReached(false);
     setShowOldData(false);
-    fetchNews();
   };
 
   const handleContinue = async () => {
@@ -80,6 +81,7 @@ export default function News(props) {
   };
 
   if (limitReached) {
+    props.setProgress(100);
     return (
       <HandleLimitReached onRetry={handleRetry} onContinue={handleContinue} />
     );
@@ -119,9 +121,7 @@ export default function News(props) {
                         ? "NewsAPP"
                         : element.description.slice(0, 80)
                     }
-                    imgUrl={
-                      element.urlToImage == null ? image : element.urlToImage
-                    }
+                    imgUrl={element.urlToImage}
                     newsUrl={element.url}
                     time={element.publishedAt}
                     source={element.source.name}
